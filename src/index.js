@@ -73,11 +73,18 @@ const state = {count: 0};
 // });;
 // // ------------------
 
+
 function apiRequest(url) {
   return new Promise(function(resolve, reject) {
     //our fake api simply returns the string passed as the 'url'
     if (url) {
-      resolve(url);
+        if(url.ok){
+            url.json().then((data) => {
+                return resolve(data);
+            });
+        }else{
+            resolve(url);
+        }
     } else {
       //if no url is passed to the function, it will fail
       reject('apiRequest failed!');
@@ -88,11 +95,17 @@ function apiRequest(url) {
   });
 }
 
-var p1 = apiRequest('https://jsonplaceholder.typicode.com/posts/1');
+
+// var p1 = fetch('https://jsonplaceholder.typicode.com/posts/1').then(  function(response){
+//     return response.json()
+// });
+var p1 = (num) => fetch('https://jsonplaceholder.typicode.com/posts/1').then(apiRequest);
+
+//var p1 = fetch('https://jsonplaceholder.typicode.com/posts/1').then(apiRequest);
 //this one will fail
 var p2 = apiRequest();
 var p3 = apiRequest('https://jsonplaceholder.typicode.com/posts/3');
-Promise.all([p1, p2, p3])
+Promise.all([p1('https://jsonplaceholder.typicode.com/posts/1'), p2, p3])
   .then(function(res) {
     console.log('Promise.all', res);
   })
