@@ -1,7 +1,12 @@
-import React from "react";
-import { render } from "react-dom";
-import { Provider, connect } from "react-redux";
-import { createStore } from "redux";
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider, connect } from 'react-redux';
+import { createStore } from 'redux';
+
+/*
+Main STATE structure
+const state = {count: 0};
+*/
 
 // var promise = new Promise(function(resolve, reject) {
 //     resolve(true);
@@ -32,7 +37,6 @@ import { createStore } from "redux";
 //       console.log("Second handler", data);
 //     });
 
-
 // Promise.all([
 //     fetch("https://jsonplaceholder.typicode.com/posts/1").then(response=>response.json()),
 //     fetch("https://jsonplaceholder.typicode.com/posts/2"),
@@ -45,7 +49,6 @@ import { createStore } from "redux";
 //   }).catch((err) => {
 //       console.log(err);
 //   });
-
 
 // var apiRequest1 = fetch('https://jsonplaceholder.typicode.com/posts/1').then(function(response){
 //     return response.json()
@@ -60,6 +63,45 @@ import { createStore } from "redux";
 // return combinedData;
 // });
 
+// // -------------------
+// var promisesToMake = [10, 10];
+// var promises = Promise.all(promisesToMake);
+// promises.then(function(results) {
+//  console.log(results);
+// }).catch(function(error) {
+//   console.log(error);
+// });;
+// // ------------------
+
+function apiRequest(url) {
+  return new Promise(function(resolve, reject) {
+    //our fake api simply returns the string passed as the 'url'
+    if (url) {
+      resolve(url);
+    } else {
+      //if no url is passed to the function, it will fail
+      reject('apiRequest failed!');
+    }
+  }).catch(function(err) {
+    //return error;
+    return err;
+  });
+}
+
+var p1 = apiRequest('https://jsonplaceholder.typicode.com/posts/1');
+//this one will fail
+var p2 = apiRequest();
+var p3 = apiRequest('https://jsonplaceholder.typicode.com/posts/3');
+Promise.all([p1, p2, p3])
+  .then(function(res) {
+    console.log('Promise.all', res);
+  })
+  .catch(function(err) {
+    console.error('err', err);
+  });
+
+
+
 // fetch('https://jsonplaceholder.typicode.com/posts/2').then(
 //   function(response){
 //      var val = response.json()
@@ -70,54 +112,54 @@ import { createStore } from "redux";
 //     //handle json data processing here
 // });
 
-
 //STEP 1 - Create REDUCER and returns the new state object
 const userReducer = (state, action) => {
-    state === undefined ? (state = { count: 0 }) : null; //Definition for beginning state value and its structure
-    switch (action.type) {
-        case "INCREMENT":
-            return Object.assign({}, state, { count: state.count + 1 }); //Using non-mutating method
-        case "DECREMENT":
-            return Object.assign({}, state, { count: state.count - 1 });
-        default:
-            return state;
-    }
+  state === undefined ? (state = { count: 0 }) : null; //Definition for beginning state value and its structure
+
+  switch (action.type) {
+    case 'INCREMENT':
+      return Object.assign({}, state, { count: state.count + 1 }); //Using non-mutating method
+    case 'DECREMENT':
+      return Object.assign({}, state, { count: state.count - 1 });
+    default:
+      return state;
+  }
 };
 
 //STEP 2 - Create STORE
 const store = createStore(
-    userReducer,
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  userReducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 ); //Redux method
 //STEP 3 - Create MAIN CLASS and its methods with using dispatch(action)
 class Counter extends React.Component {
-    render() {
-        return (
-            <div>
-                <div>
-                    <button onClick={this.props.actionDecrease}>-</button>
-                    <span>{this.props.count}</span>
-                    <button onClick={this.props.actionIncrease}>+</button>
-                </div>
-            </div>
-        );
-    }
+  render() {
+    return (
+      <div>
+        <div>
+          <button onClick={this.props.actionDecrease}>-</button>
+          <span>{this.props.count}</span>
+          <button onClick={this.props.actionIncrease}>+</button>
+        </div>
+      </div>
+    );
+  }
 }
 
 //STEP 3a - Create ACTIONS
-const actionIncrease = () => ({ type: "INCREMENT" }); //returns an action object for dispatch()
-const actionDecrease = () => ({ type: "DECREMENT" });
+const actionIncrease = () => ({ type: 'INCREMENT' }); //returns an action object for dispatch()
+const actionDecrease = () => ({ type: 'DECREMENT' });
 
 //STEP 3b - Using for mapping
-const mapStateToProps = state => {
-    return {
-        count: state.count
-    };
+const mapStateToProps = (state) => {
+  return {
+    count: state.count
+  };
 };
 //Using actions here
 const mapDispatchToProps = {
-    actionIncrease,
-    actionDecrease
+  actionIncrease,
+  actionDecrease
 };
 
 /*
@@ -126,14 +168,17 @@ Create mapping from Redux state to React component
 - Redux sate: const state = {count: 0};
 - React component: this.props.count
 */
-const CounterX = connect(mapStateToProps, mapDispatchToProps)(Counter);
+const CounterX = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Counter);
 
 //STEP 4 - Create main React component with Redux store
 const App = () => (
-    <Provider store={store}>
-        <CounterX />
-    </Provider>
+  <Provider store={store}>
+    <CounterX />
+  </Provider>
 );
 
 //RENDER your app
-render(<App />, document.getElementById("app"));
+render(<App />, document.getElementById('app'));
